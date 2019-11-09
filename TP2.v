@@ -8,6 +8,8 @@
 	Jhonata Miranda da Costa
 */
 
+`include "display7seg.v"
+
 module TP2(clk, reset, ok, tone, note, finish, type, display);
 	input ok, tone, reset, clk;
 	input [2:0] note;
@@ -77,7 +79,7 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
         
         state_inicial: begin
           if(~tone && note == note_f) 
-            state = state_first_letter;
+            state = state_n1;
           else 
             state = state_error;
           
@@ -87,11 +89,11 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 
         state_n1: begin
           if(tone && note == note_c)
-            state = state_second_letter_C;
+            state = state_n2_p;
           else if(tone && note == note_f)
-            state = state_second_letter_F;
+            state = state_n2_i;
           else if(tone && state == note_b)
-            state = state_second_letter_B;
+            state = state_n2_f;
           else
             state = state_error;
 
@@ -101,7 +103,7 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 
         state_n2_p: begin
           if(note != note_x)
-            state_third_letter_0;
+            state = state_n3_p;
           else
             state = state_error;
 
@@ -111,7 +113,7 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 
         state_n2_i: begin
           if(note != note_x)
-            state = state_third_letter_1;
+            state = state_n3_i;
           else
             state = state_error;
 
@@ -121,7 +123,7 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 
         state_n2_f: begin
           if(note != note_x)
-            state = state_third_letter_2;
+            state = state_n3_f;
           else
             state = state_error;
           
@@ -131,7 +133,7 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 
         state_n3_p: begin
           if(note != note_x)
-            state = state_fourth_letter_0;
+            state = state_n4_p;
           else
             state = state_error;
 
@@ -141,7 +143,7 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 
         state_n3_i: begin
           if(note != note_x)
-            state = state_fourth_letter_1;
+            state = state_n4_i;
           else
             state = state_error;
           
@@ -151,7 +153,7 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 
         state_n3_f: begin
           if(note != note_x)
-            state = state_fourth_letter_2;
+            state = state_n4_f;
           else
             state = state_error;
 
