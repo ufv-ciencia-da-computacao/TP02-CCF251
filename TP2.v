@@ -58,152 +58,159 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 	localparam	process_finished      = 1'b1,
 					process_not_finished  = 1'b0;
 	
-	/* save current state */
-	reg [4:0] state = state_inicial;
+	/* save current state and next state*/
+	reg [4:0] state;
+	reg [4:0] next_state;
 
-	/* Syncronous Process */
+	/* Syncronous Process - Update State*/
 	always @(posedge clk) begin
 		if(reset) 
-			state = state_inicial;
-		else if(ok) begin
+			state <= state_inicial;
+		else 
+			state <= next_state;
+	end
+	
+	/* calculate next state */
+	always @(ok, note, tone, state) begin
+		next_state = state;
+		
+		if(ok) begin
 			case(state)
 			
 				state_inicial: begin
 					if(~tone && note == note_f) 
-						state = state_n1;
+						next_state = state_n1;
 					else 
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n1: begin
 					if(tone && note == note_c)
-						state = state_n2_p;
+						next_state = state_n2_p;
 					else if(tone && note == note_f)
-						state = state_n2_i;
+						next_state = state_n2_i;
 					else if(tone && note == note_b)
-						state = state_n2_f;
+						next_state = state_n2_f;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n2_p: begin
 					if(note != note_x)
-						state = state_n3_p;
+						next_state = state_n3_p;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n2_i: begin
 					if(note != note_x)
-						state = state_n3_i;
+						next_state = state_n3_i;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n2_f: begin
 					if(note != note_x)
-						state = state_n3_f;
+						next_state = state_n3_f;
 					else
-					state = state_error;
+						next_state = state_error;
 				end
 
 				state_n3_p: begin
 					if(note != note_x)
-					state = state_n4_p;
+						next_state = state_n4_p;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n3_i: begin
 					if(note != note_x)
-						state = state_n4_i;
+						next_state = state_n4_i;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n3_f: begin
 					if(note != note_x)
-						state = state_n4_f;
+						next_state = state_n4_f;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n4_p: begin
 					if(~tone && note == note_g)
-						state = state_n5_p;
+						next_state = state_n5_p;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n4_i: begin
 					if(~tone && note == note_g)
-						state = state_n5_i;
+						next_state = state_n5_i;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n4_f: begin
 					if(~tone && note == note_g)
-						state = state_n5_f;
+						next_state = state_n5_f;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n5_p: begin
 					if(note == note_x)
-						state = state_final_p;
+						next_state = state_final_p;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n5_i: begin
 					if(note == note_x)
-						state = state_final_i;
+						next_state = state_final_i;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_n5_f: begin
 					if(note == note_x)
-						state = state_final_f;
+						next_state = state_final_f;
 					else
-						state = state_error;
+						next_state = state_error;
 				end
 
 				state_final_p: begin
-					/* do nothing */
+					next_state = state;
 				end
 
 				state_final_i: begin
-					/* do nothing */
+					next_state = state;
 				end
 
 				state_final_f: begin
-					/* do nothing */
+					next_state = state;
 				end
 
 				state_error: begin
-					/* do nothing */
+					next_state = state;
 				end
 
-				default: state = state_inicial;
-
+				default: begin
+					next_state = state_inicial;
+				end	
+				
 			endcase
-
 		end
 	end
 	
+	
+	/* calculate outputs */
 	always @(state) begin
 		case(state)
 			
-			state_error: begin
+			state_final_p: begin
 				finish = process_finished;
-				type = type_none;
-			end
-			
-			state_final_f: begin
-				finish = process_finished;
-				type = type_future;
+				type = type_past;
 			end
 			
 			state_final_i: begin
@@ -211,15 +218,21 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 				type = type_infinitive;
 			end
 			
-			state_final_p: begin
+			state_final_f: begin
 				finish = process_finished;
-				type = type_past;
+				type = type_future;
+			end
+			
+			state_error: begin
+				finish = process_finished;
+				type = type_none;
 			end
 			
 			default: begin
 				finish = process_not_finished;
 				type = type_none;
 			end
+			
 		endcase
 	end
 
