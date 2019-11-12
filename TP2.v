@@ -14,6 +14,8 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 	output reg finish;
 	output reg [1:0] type;
 	output [6:0] display;
+
+	reg prev_ok;
 	
 	/* Initializing output display */
 	display7seg d7s(tone, note, display);
@@ -62,19 +64,20 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 	reg [4:0] state;
 	reg [4:0] next_state;
 
-	/* Syncronous Process - Update State*/
+	/* Synchronous Process - Update State*/
 	always @(posedge clk) begin
 		if(reset) 
 			state <= state_inicial;
 		else 
 			state <= next_state;
+		prev_ok <= ok;
 	end
 	
 	/* calculate next state */
 	always @(ok, note, tone, state) begin
 		next_state = state;
 		
-		if(ok) begin
+		if(ok && ~prev_ok) begin
 			case(state)
 			
 				state_inicial: begin
