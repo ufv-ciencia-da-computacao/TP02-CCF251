@@ -74,9 +74,7 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 	end
 	
 	/* calculate next state */
-	always @(ok, note, tone, state) begin
-		next_state = state;
-		
+	always @(ok, note, tone, state, prev_ok) begin		
 		if(ok && ~prev_ok) begin
 			case(state)
 			
@@ -203,6 +201,9 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 				end	
 				
 			endcase
+		end
+		else begin
+			next_state = state;
 		end
 	end
 	
