@@ -42,12 +42,12 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 
 	/* Define the Notes */
 	localparam [2:0]	note_x  = 3'b000,
-							note_c  = 3'b001,
+							note_c  = 3'b100,
 							note_d  = 3'b010,
-							note_e  = 3'b011,
-							note_f  = 3'b100,
+							note_e  = 3'b110,
+							note_f  = 3'b001,
 							note_g  = 3'b101,
-							note_a  = 3'b110,
+							note_a  = 3'b011,
 							note_b  = 3'b111;
 	
 	/* Define possible outputs */
@@ -66,7 +66,7 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 
 	/* Synchronous Process - Update State*/
 	always @(posedge clk) begin
-		if(reset) 
+		if(~reset) 
 			state <= state_inicial;
 		else 
 			state <= next_state;
@@ -75,7 +75,7 @@ module TP2(clk, reset, ok, tone, note, finish, type, display);
 	
 	/* calculate next state */
 	always @(ok, note, tone, state, prev_ok) begin		
-		if(ok && ~prev_ok) begin
+		if(~ok && prev_ok) begin
 			case(state)
 			
 				state_inicial: begin
