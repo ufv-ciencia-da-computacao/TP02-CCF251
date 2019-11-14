@@ -57,6 +57,7 @@ simulation/
 *.summary
 *.tcl
 *.txt # Explicitly add any text files used
+*.vwf
 *~
 *example*
 *sopc_*
